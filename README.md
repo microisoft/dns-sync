@@ -1,8 +1,59 @@
 dns-sync
 ========
 
-SLAVE
+SERVER
+========
 
+<pre>
+
+options {
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursion yes;
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.iscdlv.key";
+
+        managed-keys-directory "/var/named/dynamic";
+        allow-transfer { 11.11.11.2; };
+        notify          yes;
+
+        also-notify {
+                11.11.11.2;
+                };
+        };
+
+key "key1" {
+                algorithm hmac-md5;
+                secret "Base64 encode pass"; #пароль
+                           };
+
+                server 11.11.11.2 { #ip адрес вторичного dns сервера
+                keys {
+                        key1;
+                        };
+                };
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+
+</pre>
+
+
+
+SLAVE
+========
 <pre>
 options {
         directory "/var/cache/bind";
